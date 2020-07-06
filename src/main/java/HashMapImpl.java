@@ -1,27 +1,27 @@
-public class HashMapImpl<K, V> {
+public class HashMapImpl {
     private static final double LOAD_FACTOR = 0.75;
     private int size;
     private int length;
-    private Node<K, V>[] nodes;
+    private Node[] nodes;
 
     public HashMapImpl() {
         length = 7;
         nodes = new Node[length];
     }
 
-    public void put(K key, V value) {
+    public void put(int key, long value) {
         if ((double) (size / length) > LOAD_FACTOR) {
             resize();
         }
         putNode(key, value);
     }
 
-    public V get(K key) {
+    public long get(int key) {
         int prob = 0;
         do {
             int hash = getHash(key, prob);
-            Node<K, V> node = nodes[hash];
-            if (node != null && node.key.equals(key)) {
+            Node node = nodes[hash];
+            if (node != null && node.key == key) {
                 return node.value;
             }
             prob++;
@@ -33,15 +33,15 @@ public class HashMapImpl<K, V> {
         return size;
     }
 
-    private void putNode(K key, V value) {
+    private void putNode(int key, long value) {
         int prob = 0;
         do {
             int hash = getHash(key, prob);
             if (nodes[hash] == null) {
-                nodes[hash] = new Node<>(key, value);
+                nodes[hash] = new Node(key, value);
                 size++;
                 return;
-            } else if (nodes[hash].key.equals(key)) {
+            } else if (nodes[hash].key == key) {
                 nodes[hash].value = value;
             }
             prob++;
@@ -51,10 +51,10 @@ public class HashMapImpl<K, V> {
 
     private void resize() {
         length = getNextPrime();
-        Node<K, V>[] oldNodes = nodes;
+        Node[] oldNodes = nodes;
         size = 0;
         nodes = new Node[length];
-        for (Node<K, V> oldNode : oldNodes) {
+        for (Node oldNode : oldNodes) {
             putNode(oldNode.key, oldNode.value);
         }
     }
@@ -75,17 +75,17 @@ public class HashMapImpl<K, V> {
         }
     }
 
-    private int getHash(K key, int prob) {
-        int hash1 = key.hashCode() % length;
-        int hash2 = (5 - (key.hashCode() % 5));
+    private int getHash(int key, int prob) {
+        int hash1 = key % length;
+        int hash2 = (5 - (key % 5));
         return Math.abs(hash1 + (prob * hash2)) % length;
     }
 
-    private static class Node<K, V> {
-        private final K key;
-        private V value;
+    private static class Node {
+        private final int key;
+        private long value;
 
-        public Node(K key, V value) {
+        public Node(int key, long value) {
             this.key = key;
             this.value = value;
         }
